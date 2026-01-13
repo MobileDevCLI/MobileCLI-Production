@@ -44,6 +44,7 @@ class TermuxService : Service() {
         private const val NOTIFICATION_ID = 1
         private const val NOTIFICATION_CHANNEL_ID = "termux_service"
         private const val NOTIFICATION_CHANNEL_NAME = "Terminal Service"
+        private const val SESSION_TRANSCRIPT_ROWS = 2000
 
         // Action constants for service commands
         const val ACTION_STOP_SERVICE = "com.termux.service.STOP"
@@ -192,7 +193,7 @@ class TermuxService : Service() {
             cwd,
             args,
             env,
-            TerminalSession.SESSION_TRANSCRIPT_ROWS_DEFAULT,
+            SESSION_TRANSCRIPT_ROWS,
             effectiveClient
         )
 

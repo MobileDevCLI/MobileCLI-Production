@@ -72,10 +72,6 @@ class BootstrapInstaller(private val context: Context) {
     val loginPath: String
         get() = File(binDir, "login").absolutePath
 
-    fun getBinDir(): File = binDir
-    fun getHomeDir(): File = homeDir
-    fun getPrefixDir(): File = prefixDir
-
     // ==========================================
     // Installation Check
     // ==========================================

@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity(), TerminalViewClient, TerminalSessionCli
 
         // Session limits
         private const val MAX_SESSIONS = 10
+        private const val SESSION_TRANSCRIPT_ROWS = 2000
 
         // Admin mode config
         private const val ADMIN_TAP_COUNT = 7
@@ -462,13 +463,13 @@ class MainActivity : AppCompatActivity(), TerminalViewClient, TerminalSessionCli
             return null
         }
 
-        val shell = File(bootstrapInstaller.getBinDir(), "bash")
+        val shell = File(bootstrapInstaller.binDir, "bash")
         if (!shell.exists()) {
             Log.e(TAG, "Shell not found: ${shell.absolutePath}")
             return null
         }
 
-        val cwd = bootstrapInstaller.getHomeDir()
+        val cwd = bootstrapInstaller.homeDir
         val args = arrayOf("-l")
         val env = bootstrapInstaller.getEnvironment()
 
@@ -483,7 +484,7 @@ class MainActivity : AppCompatActivity(), TerminalViewClient, TerminalSessionCli
             cwd.absolutePath,
             args,
             env,
-            TerminalSession.SESSION_TRANSCRIPT_ROWS_DEFAULT,
+            SESSION_TRANSCRIPT_ROWS,
             this
         )
 
@@ -1039,7 +1040,7 @@ class MainActivity : AppCompatActivity(), TerminalViewClient, TerminalSessionCli
     override fun onCodePoint(codePoint: Int, ctrlDown: Boolean, session: TerminalSession?): Boolean = false
 
     override fun onEmulatorSet() {
-        terminalView.setTerminalCursorBlinkerState(true)
+        terminalView.setTerminalCursorBlinkerState(true, true)
     }
 
     // ==========================================
@@ -1053,6 +1054,22 @@ class MainActivity : AppCompatActivity(), TerminalViewClient, TerminalSessionCli
     }
 
     override fun onTitleChanged(changedSession: TerminalSession?) {}
+
+    override fun onCopyTextToClipboard(session: TerminalSession?, text: String?) {
+        if (!text.isNullOrEmpty()) {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("MobileCLI", text))
+        }
+    }
+
+    override fun onPasteTextFromClipboard(session: TerminalSession?) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = clipboard.primaryClip
+        if (clip != null && clip.itemCount > 0) {
+            val text = clip.getItemAt(0).coerceToText(this).toString()
+            session?.write(text)
+        }
+    }
 
     override fun onSessionFinished(finishedSession: TerminalSession?) {
         if (finishedSession != null && sessions.contains(finishedSession)) {
@@ -1165,7 +1182,20 @@ class MainActivity : AppCompatActivity(), TerminalViewClient, TerminalSessionCli
     }
 
     private fun copyToClipboard() {
-        val text = terminalView.storedSelectedText
+        // Try to get selected text from terminal view
+        val text = try {
+            val field = terminalView.javaClass.getDeclaredField("mTextSelectionCursorController")
+            field.isAccessible = true
+            val controller = field.get(terminalView)
+            if (controller != null) {
+                val method = controller.javaClass.getDeclaredMethod("getSelectedText")
+                method.isAccessible = true
+                method.invoke(controller) as? String
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+
         if (text.isNullOrEmpty()) {
             Toast.makeText(this, "No text selected", Toast.LENGTH_SHORT).show()
             return
