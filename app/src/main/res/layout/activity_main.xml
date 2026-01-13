@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MobileCLI Production - Main Activity Layout
+
+    Layout structure:
+    - DrawerLayout (root) - Swipe navigation drawer
+      - Main content
+        - Session tabs (HorizontalScrollView)
+        - Terminal view
+        - Extra keys row
+      - Navigation drawer
+        - Menu items (New Session, Settings, etc.)
+        - Session list
+        - Power toggles
+-->
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/terminal_background"
+    tools:context=".MainActivity">
+
+    <!-- Main Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Session Tabs -->
+        <HorizontalScrollView
+            android:id="@+id/session_tabs_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/tab_background"
+            android:scrollbars="none"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/session_tabs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp"/>
+
+        </HorizontalScrollView>
+
+        <!-- Terminal View -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.termux.view.TerminalView
+                android:id="@+id/terminal_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/terminal_background"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+
+            <!-- Setup Overlay (shown during initial setup) -->
+            <FrameLayout
+                android:id="@+id/setup_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/setup_background"
+                android:visibility="gone">
+
+                <include layout="@layout/overlay_setup"/>
+
+            </FrameLayout>
+
+            <!-- AI Choice Overlay (IP protection) -->
+            <ScrollView
+                android:id="@+id/ai_choice_screen"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/setup_background"
+                android:visibility="gone">
+
+                <include layout="@layout/overlay_ai_choice"/>
+
+            </ScrollView>
+
+        </FrameLayout>
+
+        <!-- Extra Keys Row -->
+        <HorizontalScrollView
+            android:id="@+id/extra_keys_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/extra_keys_background"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/extra_keys"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="2dp">
+
+                <!-- ESC key -->
+                <TextView
+                    android:id="@+id/key_esc"
+                    style="@style/ExtraKeyButton"
+                    android:text="ESC"/>
+
+                <!-- CTRL key -->
+                <TextView
+                    android:id="@+id/key_ctrl"
+                    style="@style/ExtraKeyButton"
+                    android:text="CTRL"/>
+
+                <!-- ALT key -->
+                <TextView
+                    android:id="@+id/key_alt"
+                    style="@style/ExtraKeyButton"
+                    android:text="ALT"/>
+
+                <!-- TAB key -->
+                <TextView
+                    android:id="@+id/key_tab"
+                    style="@style/ExtraKeyButton"
+                    android:text="TAB"/>
+
+                <!-- Dash key -->
+                <TextView
+                    android:id="@+id/key_dash"
+                    style="@style/ExtraKeyButton"
+                    android:text="-"/>
+
+                <!-- Slash key -->
+                <TextView
+                    android:id="@+id/key_slash"
+                    style="@style/ExtraKeyButton"
+                    android:text="/"/>
+
+                <!-- Pipe key -->
+                <TextView
+                    android:id="@+id/key_pipe"
+                    style="@style/ExtraKeyButton"
+                    android:text="|"/>
+
+                <!-- Arrows -->
+                <TextView
+                    android:id="@+id/key_up"
+                    style="@style/ExtraKeyButton"
+                    android:text="\u2191"/>
+
+                <TextView
+                    android:id="@+id/key_down"
+                    style="@style/ExtraKeyButton"
+                    android:text="\u2193"/>
+
+                <TextView
+                    android:id="@+id/key_left"
+                    style="@style/ExtraKeyButton"
+                    android:text="\u2190"/>
+
+                <TextView
+                    android:id="@+id/key_right"
+                    style="@style/ExtraKeyButton"
+                    android:text="\u2192"/>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <!-- Navigation Drawer -->
+    <LinearLayout
+        android:id="@+id/nav_drawer"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:orientation="vertical"
+        android:background="@color/drawer_background"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/nav_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="MobileCLI"
+            android:textSize="24sp"
+            android:textColor="@color/drawer_item_text"
+            android:textStyle="bold"
+            android:paddingBottom="16dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/drawer_divider"/>
+
+        <!-- Scrollable menu items -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- New Session -->
+                <TextView
+                    android:id="@+id/nav_new_session"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_new_session"
+                    android:drawableStart="@drawable/ic_add"/>
+
+                <!-- Settings -->
+                <TextView
+                    android:id="@+id/nav_settings"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_settings"
+                    android:drawableStart="@drawable/ic_settings"/>
+
+                <!-- Keyboard Toggle -->
+                <TextView
+                    android:id="@+id/nav_keyboard"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_keyboard"
+                    android:drawableStart="@drawable/ic_keyboard"/>
+
+                <!-- Text Size -->
+                <TextView
+                    android:id="@+id/nav_text_size"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_text_size"
+                    android:drawableStart="@drawable/ic_text_size"/>
+
+                <!-- Install AI (Admin only initially) -->
+                <TextView
+                    android:id="@+id/nav_install_ai"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_install_ai"
+                    android:drawableStart="@drawable/ic_ai"
+                    android:visibility="gone"/>
+
+                <!-- Help -->
+                <TextView
+                    android:id="@+id/nav_help"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_help"
+                    android:drawableStart="@drawable/ic_help"/>
+
+                <!-- About -->
+                <TextView
+                    android:id="@+id/nav_about"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_about"
+                    android:drawableStart="@drawable/ic_info"/>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawer_divider"/>
+
+                <!-- Power Toggles -->
+                <TextView
+                    android:id="@+id/nav_wake_lock"
+                    style="@style/NavDrawerItem"
+                    android:text="Wake Lock: OFF"
+                    android:drawableStart="@drawable/ic_wake_lock"/>
+
+                <TextView
+                    android:id="@+id/nav_power_mode"
+                    style="@style/NavDrawerItem"
+                    android:text="Power Mode: OFF"
+                    android:drawableStart="@drawable/ic_power"/>
+
+                <!-- Developer Mode Section (Hidden by default) -->
+                <View
+                    android:id="@+id/dev_options_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawer_divider"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/nav_dev_options_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Developer Options"
+                    android:textColor="@color/drawer_item_text"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="4dp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/nav_dev_mode"
+                    style="@style/NavDrawerItem"
+                    android:text="Developer Mode: OFF"
+                    android:drawableStart="@drawable/ic_developer"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/nav_install_dev_tools"
+                    style="@style/NavDrawerItem"
+                    android:text="@string/nav_install_dev_tools"
+                    android:drawableStart="@drawable/ic_tools"
+                    android:visibility="gone"/>
+
+                <!-- Sessions Section -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawer_divider"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sessions"
+                    android:textColor="@color/drawer_item_text"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:paddingBottom="4dp"/>
+
+                <LinearLayout
+                    android:id="@+id/sessions_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- Footer with version -->
+        <TextView
+            android:id="@+id/nav_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="v2.0.0"
+            android:textColor="@color/drawer_item_text"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:paddingTop="8dp"/>
+
+    </LinearLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MobileCLI Production - Android Manifest
+
+    CRITICAL NOTES:
+    1. Package name MUST be "com.termux" - binaries have hardcoded RUNPATH
+    2. targetSdkVersion MUST be 28 - required for exec() on Android 10+
+
+    Components:
+    - SetupWizardActivity: First-launch setup (LAUNCHER)
+    - LoginActivity: License/authentication (NEW)
+    - MainActivity: Main terminal UI
+    - TermuxService: Background session service
+    - TermuxApiReceiver: 60+ API script handlers
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ========================================== -->
+    <!-- QUERIES: Package visibility for Android 11+ -->
+    <!-- ========================================== -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
+        <!-- Common browsers for OAuth -->
+        <package android:name="com.android.chrome" />
+        <package android:name="com.sec.android.app.sbrowser" />
+        <package android:name="org.mozilla.firefox" />
+        <package android:name="com.opera.browser" />
+        <package android:name="com.brave.browser" />
+    </queries>
+
+    <!-- ========================================== -->
+    <!-- PERMISSIONS: Full access for terminal ops -->
+    <!-- ========================================== -->
+
+    <!-- Network -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+    <!-- Power management -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- Foreground service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- System UI -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+    <!-- Storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+
+    <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Camera & Microphone -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <!-- Phone & Messaging -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+
+    <!-- Contacts -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <!-- Sensors & Biometrics -->
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
+    <!-- Hardware -->
+    <uses-permission android:name="android.permission.TRANSMIT_IR" />
+    <uses-permission android:name="android.permission.USB_PERMISSION"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.NFC" />
+
+    <!-- System -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <!-- ========================================== -->
+    <!-- CUSTOM PERMISSION: RUN_COMMAND -->
+    <!-- ========================================== -->
+    <permission
+        android:name="com.termux.permission.RUN_COMMAND"
+        android:label="Run commands in MobileCLI"
+        android:description="@string/run_command_permission_description"
+        android:protectionLevel="dangerous" />
+
+    <!-- ========================================== -->
+    <!-- HARDWARE FEATURES: All optional -->
+    <!-- ========================================== -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.light" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.proximity" android:required="false" />
+    <uses-feature android:name="android.hardware.fingerprint" android:required="false" />
+    <uses-feature android:name="android.hardware.consumerir" android:required="false" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+
+    <!-- ========================================== -->
+    <!-- APPLICATION -->
+    <!-- ========================================== -->
+    <application
+        android:name=".TermuxApplication"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:theme="@style/Theme.MobileCLI"
+        android:allowBackup="true"
+        android:supportsRtl="false"
+        android:extractNativeLibs="true"
+        tools:targetApi="34">
+
+        <!-- ====================================== -->
+        <!-- ACTIVITIES -->
+        <!-- ====================================== -->
+
+        <!-- Setup Wizard: Entry point (LAUNCHER) -->
+        <activity
+            android:name=".SetupWizardActivity"
+            android:theme="@style/Theme.MobileCLI.NoActionBar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login Activity: Authentication -->
+        <activity
+            android:name=".auth.LoginActivity"
+            android:theme="@style/Theme.MobileCLI.NoActionBar"
+            android:exported="false" />
+
+        <!-- Main Activity: Terminal UI -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
+            android:windowSoftInputMode="adjustResize"
+            android:resizeableActivity="true" />
+
+        <!-- Settings Activity -->
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:theme="@style/Theme.MobileCLI.NoActionBar"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- URL Handler (for OAuth callbacks) -->
+        <activity
+            android:name=".TermuxUrlHandlerActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="com.termux.OPEN_URL" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- AM Dispatcher (for termux-am) -->
+        <activity
+            android:name=".TermuxAmDispatcherActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="com.termux.AM_DISPATCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- File Receiver (for sharing files to app) -->
+        <activity
+            android:name=".filepicker.TermuxFileReceiverActivity"
+            android:exported="true"
+            android:taskAffinity="com.termux.filereceiver"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:resizeableActivity="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/*" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="message/*" />
+                <data android:mimeType="multipart/*" />
+                <data android:mimeType="text/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/*" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="text/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
+
+        <!-- ====================================== -->
+        <!-- SERVICES -->
+        <!-- ====================================== -->
+
+        <!-- Terminal Service: Background session management -->
+        <service
+            android:name=".app.TermuxService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="terminal_session" />
+        </service>
+
+        <!-- Run Command Service: External command execution -->
+        <service
+            android:name=".app.RunCommandService"
+            android:permission="com.termux.permission.RUN_COMMAND"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.termux.RUN_COMMAND" />
+            </intent-filter>
+        </service>
+
+        <!-- ====================================== -->
+        <!-- RECEIVERS -->
+        <!-- ====================================== -->
+
+        <!-- API Receiver: Handles 60+ API commands -->
+        <receiver
+            android:name=".TermuxApiReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.termux.api.API_CALL" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Open Receiver: File open requests -->
+        <receiver
+            android:name=".app.TermuxOpenReceiver"
+            android:exported="false" />
+
+        <!-- Boot Receiver: Start on boot -->
+        <receiver
+            android:name=".boot.BootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:directBootAware="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- ====================================== -->
+        <!-- PROVIDERS -->
+        <!-- ====================================== -->
+
+        <!-- Documents Provider: SAF integration -->
+        <provider
+            android:name=".filepicker.TermuxDocumentsProvider"
+            android:permission="android.permission.MANAGE_DOCUMENTS"
+            android:exported="true"
+            android:authorities="com.termux.documents"
+            android:grantUriPermissions="true">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+
+        <!-- Files Provider: File sharing -->
+        <provider
+            android:name=".app.TermuxOpenReceiver$ContentProvider"
+            android:permission="com.termux.permission.RUN_COMMAND"
+            android:exported="true"
+            android:authorities="com.termux.files"
+            android:grantUriPermissions="true" />
+
+        <!-- ====================================== -->
+        <!-- METADATA -->
+        <!-- ====================================== -->
+        <meta-data android:name="android.max_aspect" android:value="2.4" />
+        <meta-data android:name="com.samsung.android.keepalive.density" android:value="true" />
+        <meta-data android:name="com.samsung.android.multidisplay.keep_process_alive" android:value="true" />
+        <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+
+    </application>
+
+</manifest>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MobileCLI Production - Setup Overlay Layout
+
+    Shown during initial bootstrap installation.
+    Displays progress bar and status messages.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="@color/setup_background">
+
+    <!-- Logo/Icon -->
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="MobileCLI"/>
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/setup_installing_title"
+        android:textColor="@color/setup_text"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/setup_progress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:progressTint="@color/setup_accent"
+        android:max="100"/>
+
+    <!-- Percentage -->
+    <TextView
+        android:id="@+id/setup_percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0%"
+        android:textColor="@color/setup_accent"
+        android:textSize="18sp"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Step Description -->
+    <TextView
+        android:id="@+id/setup_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preparing..."
+        android:textColor="@color/setup_text_secondary"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Status Message -->
+    <TextView
+        android:id="@+id/setup_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/setup_text_secondary"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"/>
+
+</LinearLayout>
